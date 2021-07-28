@@ -56,17 +56,8 @@ func get_value_vec(vec: Vector3):
 	return get_value(x, y, z)
 
 
-func get_xyz(vec: Vector3) -> Vector3:
-	var x := Int.new()
-	var y := Int.new()
-	var z := Int.new()
-	_get_xyz(vec, x, y, z)
-	return Vector3(x.i, y.i, z.i)
-
-
 func cell_to_coords(cell: Vector3) -> Vector3:
 	return cell * cell_size
-# nice
 
 
 func coords_to_cell(coords: Vector3) -> Vector3:
@@ -75,6 +66,7 @@ func coords_to_cell(coords: Vector3) -> Vector3:
 	return cell
 
 
+# nice
 func get_world_vec(x: int, y: int, z: int) -> Vector3:
 	return (Vector3(x, y, z) * cell_size) + origin
 
@@ -112,23 +104,30 @@ func get_random_cell() -> Vector3:
 	return coords_to_cell(vec)
 
 
-func log_value(x: int, y: int, z: int):
+func log_value(x: int, y: int, z: int) -> String:
 	var vec = Vector3(x, y, z)
 	var cell = get_xyz(vec)
 	var value = get_value_vec(vec)
-	print(var2str(cell) + ": " + var2str(value))
+	var message := var2str(cell) + ": " + var2str(value)
+	print(message)
+	return message
 
 
-func log_value_vec(vec: Vector3):
-	var cell = get_xyz(vec)
-	var value = get_value_vec(vec)
-	print(var2str(cell) + ": " + var2str(value))
+func log_value_vec(vec: Vector3) -> String:
+	var v := get_xyz(vec)
+	
+	var x := int(v.x)
+	var y := int(v.y)
+	var z := int(v.z)
+	return log_value(x, y, z)
 
 
-func _get_xyz(vec: Vector3, x: Int, y: Int, z: Int):
-	x.i = int(floor(vec.x))
-	y.i = int(floor(vec.y))
-	z.i = int(floor(vec.z))
+func get_xyz(vec: Vector3) -> Vector3:
+	var v := vec
+	v.x = int(floor(vec.x))
+	v.y = int(floor(vec.y))
+	v.z = int(floor(vec.z))
+	return v
 
 
 func _generate_map():
