@@ -3,8 +3,8 @@ extends Node2D
 
 signal grid_setted(args)
 
-export var width := 20
-export var height := 20
+export var width := 5
+export var height := 5
 export var cell_size := 64
 export var origin := Vector2.ZERO
 
