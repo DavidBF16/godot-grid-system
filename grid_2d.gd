@@ -13,31 +13,27 @@ var default_value = false
 var _grid := { } setget set_grid, get_grid
 
 
-func _init(_default_value := false, _width := 5, _height := 5, _cell_size := 64, _origin := Vector2.ZERO):
+func _init(_default_value = false, _width := 5, _height := 5, _cell_size := 64, _origin := Vector2.ZERO):
+	default_value = _default_value
 	width = _width
 	height = _height
 	cell_size = _cell_size
 	origin = _origin
 	
-	_change_default_value()
 	_generate_map()
-
-
-# Override this function when extending Grid2D
-func _change_default_value():
-	default_value = false
 
 
 func set_value(value, x: int, y: int):
 	if is_valid(x, y):
 		_grid[Vector2(x, y)] = value
+		return value
 
 
-func set_value_vec(value, pos := Vector2.ONE * 64):
-	var x := Int.new()
-	var y := Int.new()
-	_get_xy(pos, x, y)
-	set_value(value, x.i, y.i)
+func set_value_vec(value, vec := Vector2.ONE * 64):
+	var cell = get_xy(vec)
+	var x := int(cell.x)
+	var y := int(cell.y)
+	set_value(value, x, y)
 
 
 # Make sure you validate the coordinates using coords_to_cell()
@@ -46,17 +42,17 @@ func get_value(x: int, y: int):
 		return _grid[Vector2(x, y)]
 
 
-func get_value_vec(pos: Vector2):
-	var x := Int.new(int(pos.x))
-	var y := Int.new(int(pos.y))
-	_get_xy(pos, x, y)
-	return get_value(x.i, y.i)
+func get_value_vec(vec: Vector2):
+	var cell = get_xy(vec)
+	var x := int(cell.x)
+	var y := int(cell.y)
+	return get_value(x, y)
 
 
-func get_xy(pos: Vector2) -> Vector2:
+func get_xy(vec: Vector2) -> Vector2:
 	var x := Int.new()
 	var y := Int.new()
-	_get_xy(pos, x, y)
+	_get_xy(vec, x, y)
 	return Vector2(x.i, y.i)
 
 
@@ -66,11 +62,11 @@ func cell_to_coords(cell: Vector2) -> Vector2:
 
 func coords_to_cell(coords: Vector2) -> Vector2:
 	var cell = coords / cell_size
-	cell.x = floor(cell.x)
-	cell.y = floor(cell.y)
+	cell = get_xy(cell)
 	return cell
 
 
+# nice
 func get_world_vec(x: int, y: int) -> Vector2:
 	return (Vector2(x, y) * cell_size) + origin
 
@@ -93,13 +89,27 @@ func is_valid(x, y) -> bool:
 	return x >= 0 and y >= 0 and x < width and y < height
 
 
-func is_valid_vec(pos: Vector2) -> bool:
-	return is_valid(pos.x, pos.y)
+func is_valid_vec(vec: Vector2) -> bool:
+	return is_valid(vec.x, vec.y)
 
 
-func _get_xy(pos: Vector2, x: Int, y: Int):
-	x.i = int(floor(pos.x))
-	y.i = int(floor(pos.y))
+func get_random_cell() -> Vector2:
+	var x := rand_range(0, width - 1)
+	var y := rand_range(0, height - 1)
+	
+	var vec := Vector2(x, y)
+	return coords_to_cell(vec)
+
+
+func log_value_vec(vec: Vector2):
+	var cell = get_xy(vec)
+	var value = get_value_vec(vec)
+	print(var2str(cell) + ": " + var2str(value))
+
+
+func _get_xy(vec: Vector2, x: Int, y: Int):
+	x.i = int(floor(vec.x))
+	y.i = int(floor(vec.y))
 
 
 func _generate_map():
