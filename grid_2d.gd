@@ -1,5 +1,5 @@
 class_name Grid2D
-#extends Node2D
+extends Node2D
 
 signal grid_setted(args)
 
@@ -10,10 +10,12 @@ export var origin := Vector2.ZERO
 
 var default_value = false
 
-var _grid := { } setget set_grid, get_grid
+var _grid := { } setget _set_grid, _get_grid
 
 
-func _init(_default_value = false, _width := 5, _height := 5, _cell_size := 64, _origin := Vector2.ZERO):
+func _init(_default_value = false, _width := 5,
+		_height := 5, _cell_size := 64,
+		_origin := Vector2.ZERO):
 	default_value = _default_value
 	width = _width
 	height = _height
@@ -59,21 +61,21 @@ func coords_to_cell(coords: Vector2) -> Vector2:
 	return cell
 
 
-func get_world_vec(x: int, y: int) -> Vector2:
+func get_world_pos(x: int, y: int) -> Vector2:
 	return (Vector2(x, y) * cell_size) + origin
 
 
-func get_world_vec_mid(x: int, y: int) -> Vector2:
-	return get_world_vec(x, y) + (Vector2.ONE * cell_size) * .5
-
 # nice
+func get_world_pos_mid(x: int, y: int) -> Vector2:
+	return get_world_pos(x, y) + (Vector2.ONE * cell_size) * .5
 
-func get_local_vec(x: int, y: int) -> Vector2:
+
+func get_local_pos(x: int, y: int) -> Vector2:
 	return Vector2(x, y) * cell_size
 
 
-func get_local_vec_mid(x: int, y: int) -> Vector2:
-	return get_local_vec(x, y)  + (Vector2.ONE * cell_size) * .5
+func get_local_pos_mid(x: int, y: int) -> Vector2:
+	return get_local_pos(x, y)  + (Vector2.ONE * cell_size) * .5
 
 
 func is_valid(x, y) -> bool:
@@ -125,11 +127,11 @@ func _generate_map():
 			_grid[Vector2(x, y)] = default_value
 
 
-func set_grid(g) -> void:
+func _set_grid(g) -> void:
 	emit_signal("grid_setted", g)
 
 
-func get_grid():
+func _get_grid():
 	return _grid
 
 

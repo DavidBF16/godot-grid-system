@@ -1,11 +1,13 @@
 extends Node2D
 
-var grid: Grid2D
+onready var grid := $Grid2D
 
 func _ready():
-	grid = Grid2D.new("Empty", 5, 5, 1, Vector2.ONE)
+	add_child(grid)
+	grid.set_owner(get_tree().get_edited_scene_root())
+	grid = Grid2D.new("Empty", 5, 5, 1, Vector2.ONE, true)
 	randomize()
-	var random := grid.get_random_cell()
+	var random = grid.get_random_cell()
 	var dictionary := {
 		"Entity": "Player1",
 		"Level": randi() % 101,
