@@ -1,5 +1,5 @@
 class_name Grid3D
-extends Node2D
+#extends Spatial
 
 signal grid_setted(args)
 
