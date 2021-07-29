@@ -1,5 +1,5 @@
 class_name Grid2D
-extends Node2D
+#extends Node2D
 
 signal grid_setted(args)
 
@@ -138,4 +138,3 @@ class Int:
 	
 	func _init(value := 0) -> void:
 		i = value
-
