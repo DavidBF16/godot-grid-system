@@ -8,30 +8,26 @@ export var height := 5
 export var cell_size := 64
 export var origin := Vector2.ZERO
 
-var default_value = false
 
 var _grid := { } setget _set_grid, _get_grid
 
 
-func _init(_default_value = false, _width := 5,
-		_height := 5, _cell_size := 64,
+func _init(_width := 5, _height := 5, _cell_size := 64,
 		_origin := Vector2.ZERO):
-	default_value = _default_value
 	width = _width
 	height = _height
 	cell_size = _cell_size
 	origin = _origin
 	
-	_generate_map()
 
 
 func set_value(value, x: int, y: int):
 	if is_valid(x, y):
-		_grid[Vector2(x, y)] = value
+		_grid[get_xy(Vector2(x, y))] = value
 		return value
 
 
-func set_value_vec(value, vec := Vector2.ONE * 64):
+func set_value_vec(value, vec: Vector2):
 	var cell = get_xy(vec)
 	var x := int(cell.x)
 	var y := int(cell.y)
@@ -40,14 +36,14 @@ func set_value_vec(value, vec := Vector2.ONE * 64):
 
 # Make sure you validate the coordinates using coords_to_cell()
 func get_value(x: int, y: int):
-	if is_valid(x, y):
+	var cell := get_xy(Vector2(x, y))
+	if is_valid_vec(cell) and _grid.has(cell):
 		return _grid[Vector2(x, y)]
 
 
 func get_value_vec(vec: Vector2):
-	var cell = get_xy(vec)
-	var x := int(cell.x)
-	var y := int(cell.y)
+	var x := int(vec.x)
+	var y := int(vec.y)
 	return get_value(x, y)
 
 
@@ -65,12 +61,12 @@ func get_world_pos(x: int, y: int) -> Vector2:
 	return (Vector2(x, y) * cell_size) + origin
 
 
-# nice
 func get_world_pos_mid(x: int, y: int) -> Vector2:
 	return get_world_pos(x, y) + (Vector2.ONE * cell_size) * .5
 
 
 func get_local_pos(x: int, y: int) -> Vector2:
+# nice
 	return Vector2(x, y) * cell_size
 
 
@@ -96,22 +92,23 @@ func get_random_cell() -> Vector2:
 	return coords_to_cell(vec)
 
 
-func log_value(x: int, y: int) -> String:
+func log_value(x: int, y: int):
 	var vec = Vector2(x, y)
 	var cell = get_xy(vec)
 	var value = get_value_vec(vec)
-	var message := var2str(cell) + ": " + var2str(value)
-	print(message)
-	return message
+	if _grid.has(cell):
+		var message := var2str(cell) + ": " + var2str(value)
+		print(message)
+		return message
 
 
-func log_value_vec(vec: Vector2) -> String:
+func log_value_vec(vec: Vector2):
 	var v := get_xy(vec)
 	
 	var x := int(v.x)
 	var y := int(v.y)
-	return log_value(x, y)
-
+	if _grid.has(Vector2(x, y)):
+		return log_value(x, y)
 
 
 func get_xy(vec: Vector2) -> Vector2:
@@ -119,12 +116,6 @@ func get_xy(vec: Vector2) -> Vector2:
 	v.x = int(floor(vec.x))
 	v.y = int(floor(vec.y))
 	return v
-
-
-func _generate_map():
-	for y in range(height):
-		for x in range(width):
-			_grid[Vector2(x, y)] = default_value
 
 
 func _set_grid(g) -> void:
