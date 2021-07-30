@@ -1,5 +1,5 @@
 class_name Grid3D
-extends Spatial
+#extends Spatial
 
 signal grid_setted(args)
 
@@ -9,22 +9,16 @@ export var depth := 5
 export var cell_size := 1
 export var origin := Vector3.ZERO
 
-var default_value = false
-
 var _grid := { } setget _set_grid, _get_grid
 
 
-func _init(_default_value = false, _width := 5, _height := 5,
-		_depth := 5, _cell_size := 1,
-		_origin := Vector3.ZERO):
-	default_value = _default_value
+func _init(_width := 5, _height := 5, _depth := 5,
+		_cell_size := 1, _origin := Vector3.ZERO):
 	width = _width
 	height = _height
 	depth = _depth
 	cell_size = _cell_size
 	origin = _origin
-	
-	_generate_map()
 
 
 func set_value(value, x: int, y: int, z: int):
@@ -32,12 +26,9 @@ func set_value(value, x: int, y: int, z: int):
 	if is_valid_vec(cell):
 		_grid[Vector3(x, y, z)] = value
 		return value
-	else:
-		return null
 
 
 func set_value_vec(value, vec := Vector3.ONE * 64):
-	vec = get_xyz(vec)
 	var x := int(vec.x)
 	var y := int(vec.y)
 	var z := int(vec.z)
@@ -46,12 +37,11 @@ func set_value_vec(value, vec := Vector3.ONE * 64):
 
 func get_value(x: int, y: int, z: int):
 	var cell := get_xyz(Vector3(x, y, z))
-	if is_valid_vec(cell):
+	if is_valid_vec(cell) and _grid.has(cell):
 		return _grid[Vector3(x, y, z)]
 
 
 func get_value_vec(vec: Vector3):
-	vec = get_xyz(vec)
 	var x := int(vec.x)
 	var y := int(vec.y)
 	var z := int(vec.z)
@@ -68,21 +58,21 @@ func coords_to_cell(coords: Vector3) -> Vector3:
 	return cell
 
 
-# nice
-func get_world_pos(x: int, y: int, z: int) -> Vector3:
+func get_world_vec(x: int, y: int, z: int) -> Vector3:
 	return (Vector3(x, y, z) * cell_size) + origin
 
 
-func get_world_pos_mid(x: int, y: int, z: int) -> Vector3:
-	return get_world_pos(x, y, z) + (Vector3.ONE * cell_size) * .5
+func get_world_vec_mid(x: int, y: int, z: int) -> Vector3:
+	return get_world_vec(x, y, z) + (Vector3.ONE * cell_size) * .5
 
 
-func get_local_pos(x: int, y: int, z: int) -> Vector3:
+# nice
+func get_local_vec(x: int, y: int, z: int) -> Vector3:
 	return Vector3(x, y, z) * cell_size
 
 
-func get_local_pos_mid(x: int, y: int, z: int) -> Vector3:
-	return get_local_pos(x, y, z)  + (Vector3.ONE * cell_size) * .5
+func get_local_vec_mid(x: int, y: int, z: int) -> Vector3:
+	return get_local_vec(x, y, z)  + (Vector3.ONE * cell_size) * .5
 
 
 func is_valid(x, y, z) -> bool:
@@ -106,22 +96,22 @@ func get_random_cell() -> Vector3:
 	return coords_to_cell(vec)
 
 
-func log_value(x: int, y: int, z: int) -> String:
+func log_value(x: int, y: int, z: int):
 	var vec = Vector3(x, y, z)
 	var cell = get_xyz(vec)
 	var value = get_value_vec(vec)
-	var message := var2str(cell) + ": " + var2str(value)
-	print(message)
-	return message
+	if _grid.has(cell):
+		var message := var2str(cell) + ": " + var2str(value)
+		print(message)
+		return message
 
 
-func log_value_vec(vec: Vector3) -> String:
-	var v := get_xyz(vec)
-	
-	var x := int(v.x)
-	var y := int(v.y)
-	var z := int(v.z)
-	return log_value(x, y, z)
+func log_value_vec(vec: Vector3):
+	var x := int(vec.x)
+	var y := int(vec.y)
+	var z := int(vec.z)
+	if _grid.has(vec):
+		return log_value(x, y, z)
 
 
 func get_xyz(vec: Vector3) -> Vector3:
@@ -130,13 +120,6 @@ func get_xyz(vec: Vector3) -> Vector3:
 	v.y = int(floor(vec.y))
 	v.z = int(floor(vec.z))
 	return v
-
-
-func _generate_map():
-	for z in range(depth):
-		for y in range(height):
-			for x in range(width):
-				_grid[Vector3(x, y, z)] = default_value
 
 
 func _set_grid(g) -> void:
